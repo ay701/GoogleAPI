@@ -1,0 +1,18 @@
+[21-Feb-2013 18:28:46 UTC] PHP Warning:  preg_match_all() [<a href='function.preg-match-all'>function.preg-match-all</a>]: Compilation failed: unmatched parentheses at offset 57 in /home/clientwe/public_html/cinejoy/ga/ga_demo.php on line 56
+[21-Feb-2013 18:28:46 UTC] PHP Warning:  Invalid argument supplied for foreach() in /home/clientwe/public_html/cinejoy/ga/ga_demo.php on line 60
+[21-Feb-2013 18:37:56 UTC] PHP Parse error:  syntax error, unexpected T_AS, expecting ';' in /home/clientwe/public_html/cinejoy/ga/ga_demo.php on line 62
+[21-Feb-2013 18:44:04 UTC] PHP Parse error:  syntax error, unexpected '<' in /home/clientwe/public_html/cinejoy/ga/matchTest.php on line 9
+[21-Feb-2013 18:52:08 UTC] PHP Warning:  preg_match() [<a href='function.preg-match'>function.preg-match</a>]: Delimiter must not be alphanumeric or backslash in /home/clientwe/public_html/cinejoy/ga/ga_demo.php on line 57
+[21-Feb-2013 18:53:52 UTC] PHP Warning:  preg_match() [<a href='function.preg-match'>function.preg-match</a>]: Unknown modifier '[' in /home/clientwe/public_html/cinejoy/ga/ga_demo.php on line 57
+[21-Feb-2013 18:57:29 UTC] PHP Parse error:  syntax error, unexpected ')' in /home/clientwe/public_html/cinejoy/ga/ga_demo.php on line 57
+[21-Feb-2013 18:57:45 UTC] PHP Parse error:  syntax error, unexpected ')' in /home/clientwe/public_html/cinejoy/ga/ga_demo.php on line 57
+[21-Feb-2013 19:24:54 UTC] PHP Warning:  preg_match_all() [<a href='function.preg-match-all'>function.preg-match-all</a>]: Unknown modifier ']' in /home/clientwe/public_html/cinejoy/ga/ga_demo.php on line 58
+[21-Feb-2013 19:27:57 UTC] PHP Warning:  preg_match_all() [<a href='function.preg-match-all'>function.preg-match-all</a>]: Unknown modifier ']' in /home/clientwe/public_html/cinejoy/ga/ga_demo.php on line 58
+[21-Feb-2013 19:29:11 UTC] PHP Warning:  preg_match_all() [<a href='function.preg-match-all'>function.preg-match-all</a>]: Unknown modifier ']' in /home/clientwe/public_html/cinejoy/ga/ga_demo.php on line 58
+[21-Feb-2013 19:29:19 UTC] PHP Warning:  preg_match_all() [<a href='function.preg-match-all'>function.preg-match-all</a>]: Unknown modifier ']' in /home/clientwe/public_html/cinejoy/ga/ga_demo.php on line 58
+[21-Feb-2013 19:29:40 UTC] PHP Warning:  preg_match_all() [<a href='function.preg-match-all'>function.preg-match-all</a>]: Unknown modifier ']' in /home/clientwe/public_html/cinejoy/ga/ga_demo.php on line 58
+[21-Feb-2013 19:35:09 UTC] PHP Warning:  preg_match_all() [<a href='function.preg-match-all'>function.preg-match-all</a>]: Unknown modifier ']' in /home/clientwe/public_html/cinejoy/ga/ga_demo.php on line 58
+[21-Feb-2013 19:57:03 UTC] PHP Parse error:  syntax error, unexpected ')', expecting T_PAAMAYIM_NEKUDOTAYIM in /home/clientwe/public_html/cinejoy/ga/ga_demo.php on line 61
+[21-Feb-2013 21:15:27 UTC] PHP Parse error:  syntax error, unexpected ')' in /home/clientwe/public_html/cinejoy/ga/ga_demo.php on line 88
+[21-Feb-2013 21:30:49 UTC] PHP Parse error:  syntax error, unexpected '}', expecting ',' or ';' in /home/clientwe/public_html/cinejoy/ga/ga_demo.php on line 120
+[21-Feb-2013 22:07:35 UTC] PHP Parse error:  syntax error, unexpected T_ECHO, expecting ',' or ';' in /home/clientwe/public_html/cinejoy/ga/ga_demo.php on line 105

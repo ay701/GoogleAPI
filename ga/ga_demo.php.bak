@@ -1,0 +1,252 @@
+<?php
+	// Include the Google Analytics data import class
+	include_once 'GAnalytics.php';
+	require "gapi.class.php";
+	
+	$profileID = "68645509";
+	$report_folder = 'GA_report';
+	// Set up a period of time to get data for
+	$fromDate = date('Y-m-d', time() - 8 * 24 * 60 *60); //one week ahead
+	$endDate  = date('Y-m-d', time() - 1 * 24 * 60 *60); //yesterday
+	$grabNum  = 25;   // default 25 results
+	
+	if(isset($_POST["submitGABtn"])) {
+		$fromDate = $_POST["fromDate"];
+		$endDate = $_POST["endDate"];
+		$grabNum = $_POST["grabNum"];
+	} 
+
+	// Set up your Google Analytics credentials
+	$gaEmail        = 'superbarmuya@gmail.com';
+	$gaPassword     = 'harvey9i';
+
+	// Get and store the query data code from Google Analytics Data Feed Query Explorer
+	// http://code.google.com/apis/analytics/docs/gdata/gdataExplorer.html
+	//
+	// You will set here your own query data url
+	$gaUrl = "https://www.googleapis.com/analytics/v2.4/data?" .
+			  "ids=ga:$profileID&" .
+			  "dimensions=ga%3ApagePath,ga%3AvisitorType,ga%3Asource,ga%3AoperatingSystem,ga%3Abrowser,ga%3AbrowserVersion,ga%3Akeyword" .
+			  "&metrics=ga%3Avisits,ga%3Apageviews,ga%3Aexits,ga%3Avisitors,ga%3AnewVisits,ga%3AtimeOnSite,ga%3AavgTimeOnSite&" .
+			 // "filters=ga%3ApagePath%3D~anunt%5C%3Fid%3D*&" .
+			  "sort=-ga%3Avisits&" .
+			  "start-date={$fromDate}&" .
+			  "end-date={$endDate}&" .
+		      "max-results=$grabNum";
+
+	// Keep your connection data into a config array
+	$config = array('email'      => $gaEmail,
+					'password'   => $gaPassword,
+					'requestUrl' => $gaUrl,
+	);
+
+	// Create a new GAnalytics object
+	$ga = new GAnalytics($config);
+
+	try {
+
+		// Call the Google Analytics API request in here
+		$gaResult = $ga->call();
+
+		// If the call was successful - do your magic in here
+		// You have to parse the Atom Feed XML response and gather you stats
+		// This can be achieved with a SimpleXML tree traversing
+		// or with a preg_match_call() to make your life easier
+		// preg_match_all("@<dxp:dimension name='ga:pagePath' value='/anunt\?id=([0-9]{1,})'/>@", $gaResult, $matches);
+		// preg_match("@<dxp:dimension name='ga:pagePath' value='/[0-9a-zA-Z-/]{1,}'/>@", $gaResult, $matches);
+		$pattern_pagePath = "@<dxp:dimension name=\"ga:pagePath\" value=\"([0-9a-zA-Z-/]{1,})\"/>@";
+		$pattern_visitorType = "@<dxp:dimension name=\"ga:visitorType\" value=\"([0-9a-zA-Z\s-/]{1,})\"/>@";
+		$pattern_source = "@<dxp:dimension name=\"ga:source\" value=\"([0-9a-zA-Z-/]{1,})\"/>@";
+		$pattern_operatingSystem = "@<dxp:dimension name=\"ga:operatingSystem\" value=\"([0-9a-zA-Z-/]{1,})\"/>@";
+		$pattern_browser = "@<dxp:dimension name=\"ga:browser\" value=\"([0-9a-zA-Z-/]{1,})\"/>@";		
+		$pattern_browserVersion = "@<dxp:dimension name=\"ga:browserVersion\" value=\"([0-9a-zA-Z-./]{1,})\"/>@";
+		$pattern_keyword = "@<dxp:dimension name=\"ga:keyword\" value=\"([0-9a-zA-Z\s()-/]{1,})\"/>@";
+		$pattern_visits = "@<dxp:metric name=\"ga:visits\" type=\"integer\" value=\"([0-9a-zA-Z-/]{1,})\"/>@";
+		$pattern_pageviews = "@<dxp:metric name=\"ga:pageviews\" type=\"integer\" value=\"([0-9a-zA-Z-/]{1,})\"/>@";
+		$pattern_exits = "@<dxp:metric name=\"ga:exits\" type=\"integer\" value=\"([0-9a-zA-Z-/]{1,})\"/>@";
+		$pattern_visitors = "@<dxp:metric name=\"ga:visitors\" type=\"integer\" value=\"([0-9a-zA-Z-/]{1,})\"/>@";
+		$pattern_newVisits = "@<dxp:metric name=\"ga:newVisits\" type=\"integer\" value=\"([0-9a-zA-Z-/]{1,})\"/>@";
+		$pattern_timeOnSite = "@<dxp:metric name=\"ga:timeOnSite\" type=\"time\" value=\"([0-9a-zA-Z.-/]{1,})\"/>@";
+		$pattern_avgTimeOnSite = "@<dxp:metric name=\"ga:avgTimeOnSite\" type=\"time\" value=\"([0-9a-zA-Z.-/]{1,})\"/>@";
+		
+		preg_match_all($pattern_pagePath, $gaResult, $matches_pagePath);
+		preg_match_all($pattern_visitorType, $gaResult, $matches_visitorType);
+		preg_match_all($pattern_source, $gaResult, $matches_source);
+		preg_match_all($pattern_operatingSystem, $gaResult, $matches_operatingSystem);
+		preg_match_all($pattern_browser, $gaResult, $matches_browser);
+		preg_match_all($pattern_browserVersion, $gaResult, $matches_browserVersion);
+		preg_match_all($pattern_keyword, $gaResult, $matches_keyword);
+		preg_match_all($pattern_visits, $gaResult, $matches_visits);
+		preg_match_all($pattern_pageviews, $gaResult, $matches_pageviews);
+		preg_match_all($pattern_exits, $gaResult, $matches_exits);
+		preg_match_all($pattern_visitors, $gaResult, $matches_visitors);
+		preg_match_all($pattern_newVisits, $gaResult, $matches_newVisits);
+		preg_match_all($pattern_timeOnSite, $gaResult, $matches_timeOnSite);
+		preg_match_all($pattern_avgTimeOnSite, $gaResult, $matches_avgTimeOnSite);
+//		echo($matches[1]."---count:".count($matches[1]));
+
+		$arr_pagePath = $matches_pagePath[1];
+		$arr_visitorType = $matches_visitorType[1];
+		$arr_source = $matches_source[1];
+		$arr_operatingSystem = $matches_operatingSystem[1];
+		$arr_browser = $matches_browser[1];
+		$arr_browserVersion = $matches_browserVersion[1];
+		$arr_keyword = $matches_keyword[1];
+		$arr_visits = $matches_visits[1];
+		$arr_pageviews = $matches_pageviews[1];
+		$arr_exits = $matches_exits[1];
+		$arr_visitors = $matches_visitors[1];
+		$arr_newVisits = $matches_newVisits[1];
+		$arr_timeOnSite = $matches_timeOnSite[1];
+		$arr_avgTimeOnSite = $matches_avgTimeOnSite[1];
+
+		echo("<div style='line-height:125%; width:750px; margin-bottom:15px;border:1px solid #DDDDDD'>");
+		echo("<table><tr><td valign='top' width='400' style='background: #F5F5F5; font-weight:bold; font-size:14px; padding:10px; color:#333333'>Profile ID: $profileID <br> Account: $gaEmail<br>Analytics report for:<br><br> <a href='http://www.ironpaper.com'><font style='font-size:28px; color:#01AEF0'>http://www.ironpaper.com</font></a></td>
+		<td style='padding:10px; background: #F5F5F5; width:350' valign='top'>");
+		echo("Total visits: ".$arr_visits[0]);
+		echo("<br>Page views: ".$arr_pageviews[0]);
+		echo("<br>Exits: ".$matches_exits[0]);
+		echo("<br>Visitors: ".$arr_visitors[0]);
+		echo("<br>New Visits: ".$arr_newVisits[0]);
+		echo("<br>Time on Site: ".$arr_timeOnSite[0]);
+		echo("<br>Average time Onsite: ".$arr_avgTimeOnSite[0]);
+		echo("</td><tr></table></div>");
+	
+		echo("<table style='border-top:1px solid #DDDDDD'>
+		<tr style='background:#F5F5F5' style='border-top:1px solid #DDDDDD'>
+		<td width='400'>Page Path</td>
+		<td width='100'>Visitor Type</td>
+		<td width='100'>Source</td>
+		<td width='100'>Operating System</td>
+		<td width='100'>Browser</td>
+		<td width='100'>Browser Version</td>
+		<td width='100'>Keyword</td>
+		<td width='100'>Visits</td>
+		<td width='100'>Page views</td>
+		<td width='100'>Exits</td>
+		<td width='100'>Visitors</td>
+		<td width='100'>New Visits</td>
+		<td width='100'>Time on Site</td>
+		<td width='100'>Average time on Site</td>
+		</tr>
+		");
+		for($i=0;$i<$grabNum;$i++){
+			$j = $i + 1;
+			echo "<tr>";
+			echo "<td>". $arr_pagePath[$i]."&nbsp;&nbsp;&nbsp;</td>";
+			echo "<td>". $arr_visitorType[$i]."&nbsp;&nbsp;&nbsp;</td>";
+			echo "<td>". $arr_source[$i]."&nbsp;&nbsp;&nbsp;</td>";
+			echo "<td>". $arr_operatingSystem[$i]."&nbsp;&nbsp;&nbsp;</td>";
+			echo "<td>". $arr_browser[$i]."&nbsp;&nbsp;&nbsp;</td>";
+			echo "<td>". $arr_browserVersion[$i]."&nbsp;&nbsp;&nbsp;</td>";
+			echo "<td>". $arr_keyword[$i]."&nbsp;&nbsp;&nbsp;</td>";
+			echo "<td>". $arr_visits[$j]."&nbsp;&nbsp;&nbsp;</td>";
+			echo "<td>". $arr_pageviews[$j]."&nbsp;&nbsp;&nbsp;</td>";
+			echo "<td>". $arr_exits[$j]."&nbsp;&nbsp;&nbsp;</td>";
+			echo "<td>". $arr_visitors[$j]."&nbsp;&nbsp;&nbsp;</td>";
+			echo "<td>". $arr_newVisits[$j]."&nbsp;&nbsp;&nbsp;</td>";
+			echo "<td>". $arr_timeOnSite[$j]."&nbsp;&nbsp;&nbsp;</td>";
+			echo "<td>". $arr_avgTimeOnSite[$j]."&nbsp;&nbsp;&nbsp;</td>";
+			echo "</tr>";
+		}
+		echo("</table>");
+
+		// echo("count matches: ". count($matches));
+		// A dummy data rendering here...
+		// var_dump($matches, $matches[1], $gaResult);
+
+		// Write output to XML file
+		if (!is_dir($report_folder)) {
+ 		   mkdir($report_folder);
+		}
+		
+		$myFile = "GA_report_".$profileID."_".date('Y-m-d', time()).".xml";
+		$fh = fopen($report_folder."/".$myFile, (file_exists($report_folder."/".$myFile)) ? 'a' : 'w');
+		fwrite($fh, $gaResult."\n");
+		fclose($fh);
+		
+		//$xml = simplexml_load_file($report_folder."/".$myFile);
+		//echo($xml."----");
+		//header("Location: ".$report_folder."/".$myFile);
+
+		/*
+		$results = array();
+		$xml = simplexml_load_string($gaResult);
+		$namespaces = $xml->getNamespaces(true);
+		foreach($xml->entry as $entry)
+    	{
+      	  $metrics = array();
+		  foreach($entry->children('http://schemas.google.com/analytics/2009')->metric as $metric)
+		  {
+			$metric_value = strval($metric->attributes()->value);
+			
+			//Check for float, or value with scientific notation
+			if(preg_match('/^(\d+\.\d+)|(\d+E\d+)|(\d+.\d+E\d+)$/',$metric_value))
+			{
+			  $metrics[str_replace('ga:','',$metric->attributes()->name)] = floatval($metric_value);
+			}
+			else
+			{
+			  $metrics[str_replace('ga:','',$metric->attributes()->name)] = intval($metric_value);
+			}
+		  }
+		  
+		  $dimensions = array();
+		  foreach($entry->children('http://schemas.google.com/analytics/2009')->dimension as $dimension)
+		  {
+			$dimensions[str_replace('ga:','',$dimension->attributes()->name)] = strval($dimension->attributes()->value);
+		  }
+		  
+		  $results[] = new gapiReportEntry($metrics,$dimensions);
+		
+		  foreach($results as $result)
+		  {
+		    echo '<strong>'.$result.'</strong><br />';
+		    echo 'Pageviews: ' . $result->getPageviews() . ' ';
+//		    echo 'Visitors: ' . $result->getVisitors() . ' ';
+		    echo 'TimeOnSite: ' . $result->getTimeOnSite() . ' ';
+		    echo 'AvgTimeOnSite: ' . $result->getAvgTimeOnSite() . ' ';
+			echo 'Visits: ' . $result->getVisits() . '<br />';
+		  }
+		}
+		*/
+		
+		/**
+		echo (string)$xml->feed->entry->dxp:dimension['value'].'<br />';
+
+		simplexml_load_file($myFile);
+		echo $xml->getName() . "<br>";
+
+		foreach($xml->children() as $child)
+  		{
+  			echo $child->getName() . ": " . $child . "<br>";
+  		}
+		**/
+		
+		/**
+		$ga = new gapi('superbarmuya@gmail.com','harvey9i');
+		$ga->requestReportData(68645509,array('pagePath','browser','browserVersion','operatingSystem','keyword'),array('uniquePageViews','pageviews','visits','visitors','timeOnSite','avgTimeOnSite'));
+
+		foreach($ga->getResults() as $result)
+		{
+			echo '<strong>'.$result.'</strong><br />';
+			echo 'Pageviews: ' . $result->getPageviews() . ' ';
+			echo 'UniquePageviews: ' . $result->getUniquePageViews() . ' ';
+			echo 'Visits: ' . $result->getVisits() . ' ';
+			echo 'Visitors: ' . $result->getVisitors() . ' ';
+			echo 'timeOnSite: ' . $result->getTimeOnSite() . ' ';
+			echo 'avgTimeOnSite: ' . $result->getAvgTimeOnSite() . '<br />';
+		}
+
+		echo '<p>Total pageviews: ' . $ga->getPageviews() . ' total visits: ' . $ga->getVisits() . '</p>';
+		**/
+		
+		echo("<div style='margin-bottom:10px'></div><h2>Report has been generated under GA_report folder.</h2>");
+		//echo($gaResult);
+		echo("<div style='font-size:14px; padding:5; width:75px; background:#EEEEEE' align='center'><a href='/mainGrab.php'>Go back</a></div>");
+
+	} catch (Exception $e) {
+
+		// Log your error here
+		echo "GAnalytics Connection error ({$e->getCode()}): {$e->getMessage()}";
+	}
